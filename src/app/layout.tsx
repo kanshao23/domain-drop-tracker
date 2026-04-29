@@ -1,0 +1,29 @@
+import type { Metadata } from "next";
+import { Geist } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "DomainDrop – Track premium domain drops",
+  description: "Get notified the moment a premium domain drops. Never miss a great domain again.",
+  openGraph: {
+    title: "DomainDrop – Track premium domain drops",
+    description: "Get notified the moment a premium domain drops.",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  );
+}
