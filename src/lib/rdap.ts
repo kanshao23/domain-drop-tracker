@@ -4,6 +4,30 @@ export interface RdapResult {
   registrar: string | null
 }
 
+// Minimal shape of the fields we read from an RDAP domain response.
+interface RdapResponse {
+  events?: { eventAction: string; eventDate: string }[]
+  entities?: { roles?: string[]; vcardArray?: [string, unknown[][]] }[]
+}
+
+// Pure parser for a registered-domain RDAP payload. Extracted so it can be
+// unit-tested without hitting the network.
+export function parseRdapResponse(data: RdapResponse): RdapResult {
+  const expiryEvent = data.events?.find(e => e.eventAction === 'expiration')
+
+  const registrarVcard = data.entities?.find(e =>
+    e.roles?.includes('registrar')
+  )?.vcardArray?.[1]
+  const registrar =
+    (registrarVcard?.find(v => v[0] === 'fn')?.[3] as string | undefined) ?? null
+
+  return {
+    registered: true,
+    expiresAt: expiryEvent?.eventDate ?? null,
+    registrar,
+  }
+}
+
 // RDAP is the modern replacement for WHOIS — public, no rate limits like WHOIS
 export async function checkDomainStatus(domain: string): Promise<RdapResult> {
   const rdapUrl = `https://rdap.org/domain/${encodeURIComponent(domain)}`
@@ -22,25 +46,7 @@ export async function checkDomainStatus(domain: string): Promise<RdapResult> {
       throw new Error(`RDAP error: ${res.status}`)
     }
 
-    const data = await res.json()
-
-    const expiryEvent = data.events?.find(
-      (e: { eventAction: string; eventDate: string }) =>
-        e.eventAction === 'expiration'
-    )
-
-    const registrar =
-      data.entities?.find(
-        (e: { roles: string[] }) => e.roles?.includes('registrar')
-      )?.vcardArray?.[1]?.find(
-        (v: string[]) => v[0] === 'fn'
-      )?.[3] ?? null
-
-    return {
-      registered: true,
-      expiresAt: expiryEvent?.eventDate ?? null,
-      registrar,
-    }
+    return parseRdapResponse(await res.json())
   } catch (err) {
     if (err instanceof Error && err.message.includes('404')) {
       return { registered: false, expiresAt: null, registrar: null }

@@ -344,6 +344,7 @@ pnpm dev     # dev server (Turbopack)
 pnpm build   # production build
 pnpm start   # serve the production build
 pnpm lint    # ESLint (next core-web-vitals + typescript)
+pnpm test    # Vitest unit tests
 ```
 
 ---
