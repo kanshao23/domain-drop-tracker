@@ -8,6 +8,7 @@ export async function sendDomainDropAlert(
   const resend = new Resend(process.env.RESEND_API_KEY)
   const porkbunLink = getAffiliateLink(domain)
   const namecheapLink = getNamecheapLink(domain)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://domaindrop.watch'
 
   await resend.emails.send({
     from: 'DomainDrop <alerts@domaindrop.watch>',
@@ -31,7 +32,7 @@ export async function sendDomainDropAlert(
     </a>
   </div>
 
-  <p style="font-size: 13px; color: #999;">You're watching this domain on <a href="https://domaindrop.watch" style="color: #999;">DomainDrop</a>. <a href="https://domaindrop.watch/unsubscribe" style="color: #999;">Manage watchlist</a></p>
+  <p style="font-size: 13px; color: #999;">You're watching this domain on <a href="${appUrl}" style="color: #999;">DomainDrop</a>. <a href="${appUrl}/dashboard" style="color: #999;">Manage watchlist</a></p>
 </body>
 </html>
     `,
