@@ -6,6 +6,7 @@ import type { User } from '@supabase/supabase-js'
 import type { Domain, Profile } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { getAffiliateLink } from '@/lib/rdap'
+import { parseDomain } from '@/lib/validation'
 
 const FREE_LIMIT = 10
 
@@ -33,10 +34,15 @@ export default function DashboardClient({ user, domains, profile }: Props) {
       return
     }
 
+    const parsed = parseDomain(input)
+    if (!parsed.ok) {
+      setError(parsed.error)
+      return
+    }
+    const domain = parsed.domain
+
     setAdding(true)
     setError('')
-
-    const domain = input.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '')
 
     const supabase = createClient()
     const { error: dbError } = await supabase.from('domains').insert({

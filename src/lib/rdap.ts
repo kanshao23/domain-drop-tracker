@@ -6,7 +6,6 @@ export interface RdapResult {
 
 // RDAP is the modern replacement for WHOIS — public, no rate limits like WHOIS
 export async function checkDomainStatus(domain: string): Promise<RdapResult> {
-  const tld = domain.split('.').pop()
   const rdapUrl = `https://rdap.org/domain/${encodeURIComponent(domain)}`
 
   try {
