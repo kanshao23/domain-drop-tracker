@@ -22,6 +22,7 @@ export default function DashboardClient({ user, domains, profile }: Props) {
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState('')
   const [upgrading, setUpgrading] = useState(false)
+  const [managingBilling, setManagingBilling] = useState(false)
 
   const isPro = profile?.plan === 'pro'
   const atLimit = !isPro && domains.length >= FREE_LIMIT
@@ -84,6 +85,14 @@ export default function DashboardClient({ user, domains, profile }: Props) {
     else setUpgrading(false)
   }
 
+  async function handleManageBilling() {
+    setManagingBilling(true)
+    const res = await fetch('/api/billing-portal', { method: 'POST' })
+    const { url } = await res.json()
+    if (url) window.location.href = url
+    else setManagingBilling(false)
+  }
+
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -107,7 +116,16 @@ export default function DashboardClient({ user, domains, profile }: Props) {
               </button>
             )}
             {isPro && (
-              <span className="text-xs bg-black text-white px-2 py-1 rounded-full font-semibold">PRO</span>
+              <>
+                <span className="text-xs bg-black text-white px-2 py-1 rounded-full font-semibold">PRO</span>
+                <button
+                  onClick={handleManageBilling}
+                  disabled={managingBilling}
+                  className="text-sm text-gray-500 hover:text-black disabled:opacity-50"
+                >
+                  {managingBilling ? '…' : 'Manage billing'}
+                </button>
+              </>
             )}
             <button onClick={handleSignOut} className="text-sm text-gray-500 hover:text-black">
               Sign out
