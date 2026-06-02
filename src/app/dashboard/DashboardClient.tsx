@@ -51,7 +51,18 @@ export default function DashboardClient({ user, domains, profile }: Props) {
     })
 
     if (dbError) {
-      setError(dbError.code === '23505' ? 'Already watching this domain.' : dbError.message)
+      if (dbError.code === '23505') {
+        setError('Already watching this domain.')
+      } else if (dbError.code === '23514') {
+        // DB-level guard: either the free-plan limit or the format check.
+        setError(
+          dbError.message.includes('Free plan')
+            ? 'Free plan limit reached. Upgrade to Pro for unlimited domains.'
+            : 'Enter a valid domain, e.g. example.com'
+        )
+      } else {
+        setError(dbError.message)
+      }
     } else {
       setInput('')
       router.refresh()
