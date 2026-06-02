@@ -7,12 +7,18 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://domaindrop.watch";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
   title: "DomainDrop – Track premium domain drops",
   description: "Get notified the moment a premium domain drops. Never miss a great domain again.",
   openGraph: {
     title: "DomainDrop – Track premium domain drops",
     description: "Get notified the moment a premium domain drops.",
+    url: "/",
+    siteName: "DomainDrop",
+    type: "website",
   },
 };
 
